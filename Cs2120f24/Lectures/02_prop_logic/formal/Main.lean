@@ -153,17 +153,19 @@ def p2  : PLExpr := sorry
 /-!
 If it's raining and the sprinkler's running, then it's raining.
 -/
-def p3  : PLExpr := sorry
+def p3  : PLExpr := (itsRaining ∧ sprinklerOn) → itsRaining
 
 /-!
 If it's raining ,then it's raining or the sprinkler's running.
 -/
-def p4  : PLExpr := sorry
+def p4  : PLExpr := itsRaining → itsRaining ∨ sprinklerOn
 
 /-!
 If the sprinkler's running, it's raining or the sprinkler's running.
+This is not a valid statement, because it raining doesnt encessarily mean
 -/
-def p5  : PLExpr := sorry
+def p5  : PLExpr := sprinklerOn → itsRaining ∨ sprinklerOn
+
 
 /-!
 Whenever it's raining the streets are wet.
@@ -181,13 +183,16 @@ whenever it's raining then the streets are wet, then (c) if
 whenever the sprinkler's running then the streets are wet, then
 _________. What is the conclusion? Write the expression in PL.
 -/
-def p8  : PLExpr := sorry
+def p8  : PLExpr := itsRaining ∨ sprinklerOn → (itsRaining → streetWet) → (sprinklerOn → streetWet) → streetWet
 
+#eval isValid(p8)
 /-!
 If whenever it's raining, the streets are wet, then whenever the
 streets are wet it's raining.
+
+FALSE
 -/
-def p9  : PLExpr := sorry
+def p9  : PLExpr :=
 
 
 /-!
