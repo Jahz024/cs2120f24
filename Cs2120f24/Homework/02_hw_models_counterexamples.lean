@@ -64,7 +64,8 @@ def affirm_consequent := (isSprinkling ⇒ isRaining) ⇒ isRaining ⇒ isSprink
 
 Replace _ with the expression to get the list of counterexamples to affirm_disjunct
 -/
-def cxs : List BoolInterp := sorry
+def cxs : List BoolInterp := findCounterexamples affirm_disjunct
+
 
 -- This "code" should display the resulting interpretations lists of 0/1 strings
 -- It'll work when you fill in an answer above.
@@ -86,8 +87,15 @@ in which that's just not the case: not happy and blue.
 
 /-
 You answers here:
-
+The epxression states that if iti s raining or sprinkling, then if it is rianing, it must not be sprinkling. But in this interpretation,
+both isRaining and isSprinkling are true. So for this proposition to hold, then not isSprinkling (¬isSprinkling) should be true (meaning isSprinkling should e false.)
+Since both isRaining & isSPrinkling are true, this implication fails. So this interpretation serves as a counter example.
 -/
+def deny_antecedent_cxs : List BoolInterp := findCounterexamples deny_antecedent
+#eval! interpStringsFromInterps deny_antecedent_cxs 2
+
+def affirm_consequent_cxs : List BoolInterp := findCounterexamples affirm_consequent
+#eval! interpStringsFromInterps affirm_consequent_cxs 2
 
 /- #3 [50 points].
 
@@ -100,6 +108,18 @@ Do the same thing with each of the other two fallacies.
 
 /-
 Your answers here:
+deny_antecedent:
+this expression states that if the sprinkler being on implies it i s raining, then if the sprinkler is not on, it must not be in raining. However, isRaining = true
+& isSprinkling = false. The implication that isSprinkling ⇒ isRaining is true b/c isSprinkling = false. But hte implication that ¬isSprinkling ⇒ ¬isRaining
+is false b/c ¬isSprinking is true (since isSPrinkling is false) but ¬isRaining is false (since isRaining = true)
+ .So this interpreation is a counterexample where the expression would be false. ¬isRaining is false (since isRaining = true)
+
+
+affirm_consequent:
+this expression state sthat if the sprinkler being on implies that it is raining, then if it is raining, the sprinkler must also be on.
+so here, isRaining = true and isSprinkling = false.The implication isSPrinkling ⇒ isRaining is true b/c isSPrinkling is false. But the implication
+ that isRaining ⇒ isSprinkling is false b/c isRaining is true but isSPrinkling is false. So this interpretation is also a counterexample where the expression
+ is false.
 
 -/
 
