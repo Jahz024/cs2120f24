@@ -82,31 +82,18 @@ A. It's raining and the sprinkler is running.
 -/
 def formal_0 : PLExpr := rain ∧ sprink
 
-example : ¬ valid formal_0 := by tauto
-
--- This is not valid b/c it's false when it's not raining or the sprinkler is not running.
-
-
 
 /-!
 B. If it's raining then it's raining or the sprinkler's running.
 Rememver to use \=> for the implies "connective" (expression
 builder).
 -/
-def formal_1 : PLExpr := rain ⇒ (rain ∨ sprink)
-
-example : valid formal_1 := by tauto
-
--- This  is valid, so we don't need a counterexample.
+def formal_1  : PLExpr := rain ⇒ (rain ∨ sprink)
 
 /-!
 C. If the sprinkler's running then it's raining or it's sprinkling.
 -/
-def formal_2 : PLExpr := sprink ⇒ (rain ∨ sprink)
-
-example : valid formal_2 := by tauto
-
--- This is valid, so we don't need a counterexample.
+def formal_2  : PLExpr := sprink ⇒ (rain ∨ sprink)
 
 /-!
 D. Whenever it's raining the streets are wet. You can express the same
@@ -115,23 +102,13 @@ these two English-language phrases mean the same thing. You will want to
 use the "whenever" form sometimes and the "if then" form sometimes when
 writing logic in English.
 -/
-def formal_3 : PLExpr := rain ⇒ wet
-
-example : ¬ valid formal_3 := by tauto
-
--- This is not valid b/c it's false when it's raining but the streets are not wet
--- (e.g it just started raining and not enough time has passed to get the street's wet yet).
-
+def formal_3  : PLExpr := rain ⇒ wet
 
 /-!
 E. Whenever the sprinkler's running the streets are wet.
 -/
 def formal_4 : PLExpr := sprink ⇒ wet
-
-example : ¬ valid formal_4 := by tauto
-
--- This is not valid b/c it's false when the sprinkler is running but the streets are not wet
---  (e.g the sprinkler just started and the water hasn't reached the street yet).
+#eval! is_valid formal_4
 
 /-!
 Here's an example, from class, of a proposition built up in
@@ -147,55 +124,47 @@ Add a check for the validity of this expression. The *example*
 keyword in Lean asks Lean to check a term without binding a
 name to it.
 -/
-example : PLExpr :=
+def foo : PLExpr :=
   (rain ∨ sprink) ⇒
   (rain ⇒ wet) ⇒
   (sprink ⇒ wet) ⇒
   wet
 
-
 -- Write your validity check here
-#eval! is_valid ((rain ∨ sprink) ⇒ (rain ⇒ wet) ⇒(sprink ⇒ wet) ⇒ wet)
+#eval! is_valid ((rain ∨ sprink) ⇒ (rain ⇒ wet) ⇒ (sprink ⇒ wet) ⇒ wet)
+#eval! is_valid foo
 
 /-!
 If (whenever it's raining, the streets are wet), then (whenever the
 streets are wet it's raining.)
 -/
 def formal_5 : PLExpr := (rain ⇒ wet) ⇒ (wet ⇒ rain)
+#eval! is_valid formal_5
 
-example : ¬ valid formal_5 := by tauto
+-- NO formal_06
 
 
 /-!
 If (whever it's raining then bottom)/false, then (it's not raining).
 -/
-def formal_7 : PLExpr := (rain ⇒ false) ⇒ (¬rain)
-
-example : valid formal_7 := by tauto
-
--- This proposition is valid, so we don't need a counter example.
+def formal_7  : PLExpr := (rain ⇒ ⊥) ⇒ ¬rain
+#eval! is_valid formal_7
 
 
 /-!
 If whenever it's raining the streets are wet, then whenever it's not
 raining the streets are not wet.
 -/
-def formal_8 : PLExpr := (rain ⇒ wet) ⇒ ((¬rain) ⇒ (¬wet))
+def formal_8 : PLExpr := (rain ⇒ wet) ⇒ (¬rain ⇒ ¬wet)
+#eval! is_valid formal_8
 
-example : ¬ valid formal_8 := by tauto
-
--- This is not valid b/c it's false when it's not raining but the streets are still wet
--- (e.g if it rained earlier but has stopped, or if the sprinkler is running).
 
 /-!
 If whenever it's raining the streets are wet, then whenever the
 streets are not wet, it's not be raining.
 -/
-def formal_9 : PLExpr := (rain ⇒ wet) ⇒ ((¬wet) ⇒ (¬rain))
-
-example : valid formal_9 := by tauto
-
--- This proposition is valid, so we don't need a counter example
+def formal_9 : PLExpr := (rain ⇒ wet) ⇒ (¬wet ⇒ ¬rain)
+#eval! is_valid formal_9
 
 /-!
 PROPOSITIONAL LOGIC TO ENGLISH: 50 points
@@ -211,167 +180,137 @@ the funny names we assign to these propositions.
 -/
 
 def and_intro := sprink ⇒ rain ⇒ sprink ∧ rain
-
-/*
-if it's sprinkling, then if it's raining, then it's both sprinkling and raining.
-*/
-
-example : valid and_intro := by tauto
-
--- valid b/c if both conditions are true, we can say both are happening at once
+/-!
+If it's sprinkling, and then if it's (also) raining, then
+it's sprinkling and it's raining.
+-/
 
 def and_elim_left := sprink ∧ rain ⇒ sprink
-
-/*
-if it's sprinkling and raining, then it's sprinkling.
-*/
-
-example : valid and_elim_left := by tauto
-
--- valid b/c if both are true, we can just focus on one part
+/-!
+If it's sprinkingling and raining, then it's sprinking.
+-/
 
 def and_elim_right := sprink ∧ rain ⇒ rain
+/-!
+If it's sprinkingling and raining, then it's raining.
+-/
 
-/*
-if it's sprinkling and raining, then it's raining.
-*/
-
-example : valid and_elim_right := by tauto
-
--- valid b/c same as and_elim_left, but now for the rain part
 
 def or_intro_left := sprink ⇒ sprink ∨ rain
+/-!
+If it's sprinkling then it's sprinkling or it's raining.
+-/
 
-/*
-if it's sprinkling, then it's either sprinkling or raining.
-*/
-
-example : valid or_intro_left := by tauto
-
--- valid b/c we can add in another option when we know one is true
-
-def or_intro_right := rain ⇒ sprink ∨ rain
-
-/*
-if it's raining, then it's either sprinkling or raining.
-*/
-
-example : valid or_intro_right := by tauto
-
--- valid b/c works like or_intro_left but from the rain side
+def or_intro_right :=  rain ⇒ sprink ∨ rain
+/-!
+If it's raining then it's sprinkling or it's raining.
+-/
 
 def or_elim := rain ∨ sprink ⇒ (rain ⇒ wet) ⇒ (sprink ⇒ wet) ⇒ wet
+/-!
+If it's raining or sprinkling, then if it's also the case that
+whenever it's raining it's wet, then if in addition it's the case
+that whenever it's sprinkling it's wet, then it's wet. (The idea is
+that because at least one of the cases of the *disjunction* is true
+and in either case it's wet, then it must be wet.)
+-/
 
-/*
-if it's raining or sprinkling, and if rain makes it wet, and if sprinkling makes it wet,
-then it's wet.
-*/
+def neg_intro := (sprink ⇒ ⊥) ⇒ ¬sprink
+/-!
+If whenever it's sprinkling false is true then it's not sprinkling.
 
-example : valid or_elim := by tauto
+We could also say that if sprinkling being true leads to a
+contradiction, then it must not be sprinkling. This proposition is
+also known as "proof by negation:" To show that it's not sprinking
+it *suffices* to show that, if it were, an impossibiliity occurs.
+As that cannot happen in our logic, it must not be sprinkling.
+-/
 
--- valid b/c we look at both scenarios and see they lead to the same result
+def neg_elim := ¬¬sprink ⇒ sprink
+/-!
+If it's not not sprinkling then it is sprinkling.
 
-def not_intro := (sprink ⇒ ⊥) ⇒ ¬sprink
+At the heart of propositional logic is what we call
+"the law of the excluded middle," which states that
+there every proposition is either true or false: one
+or the other must hold.
 
-/*
-if sprinkling leads to a contradiction, then it's not sprinkling.
-*/
-
-example : valid not_intro := by tauto
-
--- valid b/c if sprinkling can't happen without breaking logic, then it can't happen
-
-def not_elim := ¬¬sprink ⇒ sprink
-
-/*
-if it's not not sprinkling, then it's sprinkling.
-*/
-
-example : valid not_elim := by tauto
-
--- valid b/c this is just removing the double negation
+In particular, sprink must be true or it must be false.
+In it's true, ¬sprink is false, and ¬(false) is true,
+and true ⇒ true is true, so the overall proposition is
+true in this case. Next, if sprink is false, well, then
+¬ false is true, and ¬ true is false, so we have that
+false ⇒ false, and that's also true. *So the proposition
+is true in either case *and, as, those are the only two
+possible cases by the law of the excluded middle*, the
+proposition is invariably true, thus valid.
+-/
 
 def imp_intro := sprink ⇒ wet ⇒ (sprink ⇒ wet)
+/-!
+If it's sprinkling, then if (in that *context*) it's
+also wet, then we can conclude that if it's sprinkling
+then it's wet.
 
-/*
-if it's sprinkling, then if it's wet, then sprinkling implies wetness.
-*/
-
-example : valid imp_intro := by tauto
-
--- valid b/c this is how we set up implications logically
+Implies needs to be right associative so that we can
+read it left to right gather a context of assumptions.
+Here we first assume sprink, then we assume wet, then
+*in that context*, we want to know if sprink ⇒ wet.
+-/
 
 def imp_elim := (sprink ⇒ wet) ⇒ sprink ⇒ wet
-
-/*
-if sprinkling implies wetness, then if it's sprinkling, it's wet.
-*/
-
-example : valid imp_elim := by tauto
-
--- valid b/c if "if p then q" and "p" are true, then "q" has to be true too (modus ponens)
+/-
+If whenever it's sprinkling it's wet, then if (in that
+context) it's sprinkling then it must be wet.
+-/
 
 def equiv_intro := (sprink ⇒ wet) ⇒ (wet ⇒ sprink) ⇒ (sprink ↔ wet)
-
-/*
-if sprinkling implies wetness, and wetness implies sprinkling, then
-sprinkling is equivalent to wetness.
-*/
-
-example : ¬ valid equiv_intro := by tauto
-
--- not valid b/c wetness might be caused by something else
+/-
+If whenever it's sprinking it's wet, then if whevever
+it's wet it's sprinkling, then sprinkling and wet are
+equivalent: it's sprinkling if and only if it's wet.
+-/
 
 def equiv_elim_left := (sprink ↔ wet) ⇒ (sprink ⇒ wet)
-
-/*
-if sprinkling is equivalent to wetness, then sprinkling implies wetness.
-*/
-
-example : valid equiv_elim_left := by tauto
-
--- valid b/c from an equivalence, we can get one direction of implication
+/-
+If it's sprinkling if and only if it's wet, then if it's
+sprinkling then it's wet.
+-/
 
 def equiv_elim_right := (sprink ↔ wet) ⇒ (wet ⇒ sprink)
+/-
+If it's sprinkling if and only if it's wet, then if it's
+wet then it's sprinkling.
+-/
+#eval! is_valid equiv_elim_right
 
-/*
-if sprinkling is equivalent to wetness, then wetness implies sprinkling.
-*/
+def affirm_disjunct := (rain ∨ sprink) ⇒ rain ⇒ ¬sprink
+/-!
+If it's wet or sprinkling then if it's not wet it's not
+sprinkling.
 
-example : valid equiv_elim_right := by tauto
+This one is easier to understand is the identiers line
+up with our intuition: (rain ∨ sprink) ⇒ rain ⇒ ¬sprink.
+This says if it's raining or sprinking and not raining
+then it's sprinkling. Why is that wrong?
+-/
 
--- valid b/c same as equiv_elim_left but for the other direction
-
-def affirm_disjunct := (wet ∨ sprink) ⇒ wet ⇒ ¬sprink
-
-/*
-if it's wet or sprinkling, and it's wet, then it's not sprinkling.
-*/
-
-example : ¬ valid affirm_disjunct := by tauto
-
--- not valid b/c it can be wet and sprinkling at the same time
 
 def affirm_consequent := (sprink ⇒ wet) ⇒ wet ⇒ sprink
+/-!
+If whenever it's sprinkling it's wet, then whenever it's
+wet it must be sprinkling.
 
-/*
-if sprinkling implies wetness, and it's wet, then it's sprinkling.
-*/
-
-example : ¬ valid affirm_consequent := by tauto
-
--- not valid b/c this is a logical mistake; there could be other reasons it's wet
+Why is this wrong?
+-/
 
 def deny_antecedent := (sprink ⇒ wet) ⇒ ¬sprink ⇒ ¬wet
+/-
+If whenever it's sprinkling it's wet, then if it's not
+sprinkling it must not be wet.
 
-/*
-if sprinkling implies wetness, and it's not sprinkling, then it's not wet.
-*/
-
-example : ¬ valid deny_antecedent := by tauto
-
--- not valid b/c there could be other things making it wet, not just sprinkling
-
+Why is this wrong?
+-/
 
 
 /-
@@ -386,8 +325,8 @@ Are they valid?
 #eval! is_valid  or_intro_right
 #eval! is_valid  or_elim
 
-#eval! is_valid  not_intro
-#eval! is_valid  not_elim
+#eval! is_valid  neg_intro
+#eval! is_valid  neg_elim
 
 #eval! is_valid  imp_intro
 #eval! is_valid  imp_elim
