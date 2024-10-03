@@ -21,7 +21,8 @@ constructing operators. Here's how you do it.
 def v₀ : BoolVar := BoolVar.mk 0    -- abstract syntax
 def v₁ : BoolVar := ⟨1⟩             -- Lean notation for mk
 def v₂ : BoolVar := ⟨2⟩
-
+def x0: BoolVar := (3)
+def superVariable: BoolVar := BoolVar.mk 4
 /-!
 Now you define the variable expressions you want to use. The
 first line is using abstract syntax. The next two use our own
@@ -36,7 +37,8 @@ out for now so as not to introduce conflicting definitions.
 def P : PLExpr := PLExpr.var_expr v₀
 def Q : PLExpr := { v₁ }  -- our notation for var_expr constructor
 def R : PLExpr := { v₂ }
-
+def Z: PLExpr := {x0}
+def X: PLExpr := {superVariable}
 /-
 Now that you have three variable expressions to work with,
 you can use logical expression "connectives" (operators) to

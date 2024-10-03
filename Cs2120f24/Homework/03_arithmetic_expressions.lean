@@ -31,11 +31,17 @@ notation e1 " * " e2 => ArithExpr.binOp ArithBinOp.mul e1 e2
 
 -- Semantics (incomplete, to be finished in homework)
 def arithEval : ArithExpr → (ArithVar → Nat) → Nat
-| ArithExpr.lit (fromNat : Nat),       i =>  fromNat
-| ArithExpr.var (fromVar : ArithVar), i => i fromVar
-| ArithExpr.unOp op e,                i => 0
-| ArithExpr.binOp op e1 e2,           i => 0
-
+| ArithExpr.lit (fromNat : Nat),       i => fromNat
+| ArithExpr.var (fromVar : ArithVar),  i => i fromVar
+| ArithExpr.unOp ArithUnOp.fac e,      i =>
+    let rec factorial (n : Nat) : Nat :=
+        match n with
+        | 0 => 1
+        | n + 1 => (n + 1) * factorial n
+    factorial (arithEval e i)
+| ArithExpr.binOp ArithBinOp.add e1 e2, i => (arithEval e1 i) + (arithEval e2 i)
+| ArithExpr.binOp ArithBinOp.sub e1 e2, i => (arithEval e1 i) - (arithEval e2 i)
+| ArithExpr.binOp ArithBinOp.mul e1 e2, i => (arithEval e1 i) * (arithEval e2 i)
 /-!
 HOMEWORK:
 
@@ -93,6 +99,8 @@ a model to complete this assignment.
 #eval arithEval (X + Y) interp_1    -- expect 5
 #eval arithEval (X * Y) interp_1    -- expect 6
 #eval arithEval (Y - [1]) interp_1  -- expect 1
+
+-- I believe the aobve should be 2, not sure why it says expect 1
 
 -- Extra credit: Make this work, too. No hints.
 #eval arithEval (Y !) interp_1      -- expect 6
