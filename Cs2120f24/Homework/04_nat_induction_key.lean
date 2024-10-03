@@ -361,20 +361,35 @@ in each row using the values from the previous row. That
 will tell you what your step function will be.
 -/
 
-def baseSq : Nat := _
+
+
+def baseSq : Nat := 0
+
 def stepSq : Nat → Nat → Nat
-| 0 => _
-| _ => _
-def sumSq' : Nat → Nat := _      -- apply Nat.rec
+| 0, _ => 1
+| (n' + 1), sumSq_n' => (n'+1)^2 +sumSq_n'
+
+
+def sumSq' : Nat → Nat := Nat.rec baseSq stepSq
+
+
 def sumSq : Nat → Nat
-| _ => _
-| _ => _
+| 0 => 0                   -- corrected from previous release
+| (n' + 1) => (n' + 1)^2 + sumSq n'
 
 /-!
 Format your table here
 
-
+| n |  n' |  n^2  | SumSq n'  | SumSq n  | comments
+| 0 |     |       |           |    0     | initial state
+| 1 |  0  |    1  |     0     |    1     | step up
+| 2 |  1  |    4  |     1     |    5     | step up
+| 3 |  2  |    9  |     5     |   14     | step up
+| 4 |  3  |   16  |    14     |   30     | step up
+| 5 |  4  |   25  |    30     |   55     | step up
 -/
+
+#eval sumSq 5
 
 /-!
 Now write test cases as above, including "expect"
@@ -472,7 +487,7 @@ def binaryRep : Nat → String
 | 0 => "0"
 | 1 => "1"
 | n' + 2 => let n := n' + 2
-            _ ++ toString (n % 2)
+            binaryRep (n / 2) ++ toString (n % 2)
 
 -- Complete the definition. The tests will work,.
 #eval binaryRep 0   --expect "0"
@@ -562,10 +577,15 @@ third case for the indutive construction, for any n = (n' + 2).
 -/
 
 def fib : Nat → Nat
-| 0 => _
-| 1 => _
-| n' + 2 => _
+| 0 => 0
+| 1 => 1
+| n' + 2 => fib n' + fib (n' + 1)
 
 /-
 Write test cases for 0, 1, 2, and 10. Does it work?
 -/
+
+#eval fib 0
+#eval fib 1
+#eval fib 2
+#eval fib 10

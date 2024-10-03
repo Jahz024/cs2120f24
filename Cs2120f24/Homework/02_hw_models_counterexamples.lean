@@ -1,4 +1,4 @@
-import «Cs2120f24».Lectures.«02_prop_logic».formal.models_counterexamples
+import «Cs2120f24».Library.propLogic.interpretation
 
 namespace cs2120f24
 
@@ -68,8 +68,8 @@ def cxs : List BoolInterp := findCounterexamples affirm_disjunct
 
 
 -- This "code" should display the resulting interpretations lists of 0/1 strings
--- It'll work when you fill in an answer above.
-#eval! interpStringsFromInterps cxs 2
+-- It'll work when you fill in an answer above and uncomment it.
+-- #eval! interpStringsFromInterps cxs 2
 
 
 /- #2: [25 points]. Translating counterexamples back into English.

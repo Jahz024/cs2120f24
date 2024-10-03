@@ -1,9 +1,10 @@
-import «Cs2120f24».Lectures.«02_prop_logic».formal.properties
-import «Cs2120f24».Lectures.«02_prop_logic».formal.interpretation
-import «Cs2120f24».Lectures.«02_prop_logic».formal.models_counterexamples
-import Cs2120f24.Lectures.«02_prop_logic».formal.semantics
-import Cs2120f24.Lectures.«02_prop_logic».formal.syntax
-namespace cs2120f24
+import Cs2120f24.Lectures.«02_prop_logic».formal.model_theory.properties
+import Cs2120f24.Lectures.«02_prop_logic».formal.model_theory.counterexamples
+
+--.modelTheory.properties
+--import Cs2120f24.Library.modelTheory
+
+namespace cs2120f24.lecture.prop_logic
 
 open PLExpr
 
@@ -382,4 +383,4 @@ def p13 : PLExpr := sorry
 def p14 : PLExpr := sorry
 def p15 : PLExpr := sorry
 
-end cs2120f24
+end cs2120f24.lecture.prop_logic
