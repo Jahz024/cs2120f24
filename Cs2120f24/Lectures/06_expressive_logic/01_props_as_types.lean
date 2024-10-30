@@ -42,6 +42,8 @@ inductive C : Type where
 | cvilleBirthCert
 | cvilleDriversLicense
 | cvilleUtilityBill
+-- KEY WORD: GEnaralize FROM THESE ISTances to introduce a parameter
+-- person type
 
 -- later we'll replace these two propositions with one predicate
 -- we can also see here that a proposition can have multiple proofs
@@ -50,10 +52,17 @@ open K
 open C
 
 -- We can now "give proofs" of our two respective propositions
-
+inductive KLA : Type where
 --  proof name  proposition/type    proof/value
 def pfK      : K :=              K.cvilleDriversLicense
 def pfC      : C :=              C.cvilleUtilityBill
+def pfkLa    : kLA :=            sorry
+
+predicate isFromCharlottesville person => predicate
+-- I can't see the board******, forgot my glasses so this wo
+
+
+-- kevin is from LA
 
 /-!
 We've introduced no new Lean constructs at this point. We've just
@@ -214,9 +223,15 @@ can derive from it a proof of C ∧ K?
 inductive CandK : Type where
 | intro (c : C) (k : K)
 
+-- intro: K → C → K ∧ KC
+inductive KandC : Type where
+| intro (k : K) (c : C)
+
 -- elim_left: C ∧ K → C
 def CandK_elim_left : CandK → C
 | CandK.intro c _ => c
+
+
 
 -- elim_right: C ∧ K → K
 def CandK_elim_right : CandK → K
@@ -238,6 +253,9 @@ that from any proof of KandC we can derive a proof of CandK!
 
 def andCommutes : KandC → CandK
 | KandC.intro k c => CandK.intro c k
+
+-- C and K
+-- A proof of a conjunction will be a data structure while the proof of an implcication will be a function
 
 /-!
 To the left of the =>, we analyze the given/assumed proof
@@ -320,4 +338,23 @@ theory.
 - with lots more to come
 
 Fun!
+-/
+
+/-!
+# notes
+Propositions as Types, Proofs as Values:
+propositions are represented as types, and proofs of these propositions are represented as values of the corresponding types.
+if a proposition has no values (proofs), it is considered false.
+the elimination rules of logic, such as for conjunction (and), are represented as functions that manipulate proofs.
+logical Connectives:
+conjunction (and):
+a proposition like "Kevin and Carter are from Charlottesville" (K ∧ C) is represented as a type KandC. A proof of KandC requires two proofs—one for each conjunct (K and C).
+introduction rule: A constructor intro that combines proofs of K and C into a proof of KandC.
+elimination rules: Functions KandC_elim_left and KandC_elim_right extract proofs of K and C from a proof of KandC.
+implication:
+implication (→):
+a proof of an implication, P → Q, is represented as a function that takes a proof of P and returns a proof of Q.
+elimination rule: If you have a function that maps P to Q (P → Q), and a proof of P, you can apply the function to obtain a proof of Q.
+commutativity of Conjunction:
+the proof that conjunction is commutative (K ∧ C → C ∧ K) is demonstrated using Lean's type theory. The function andCommutes takes a proof of K ∧ C and returns a proof of C ∧ K by reordering the components.
 -/

@@ -83,7 +83,7 @@ types.
 
 /-!
 ### Specializing to Propositions By Application to Parameter Values
-
+-- define predicate isEven in exactly this file
 Applied to arguments a predicate yields a proposition. In
 Lean, we represent propositions as types. So here we are
 defining propositions called KIFC and CIFC.
@@ -125,7 +125,7 @@ manner we just introduced.
 inductive Ev : Nat → Type where
 | pfZero : Ev 0
 | pfEvPlus2 : (n : Nat) → Ev n → Ev (n+2)
-
+-- ACCEPT AS AXIOM THAT 0 IS EVEn
 open Ev
 
 /-!
@@ -135,7 +135,10 @@ And here are some proofs of evenness
 def pfZeroEv : Ev 0 := pfZero
 def pfTwoEv : Ev 2 := pfEvPlus2 0 pfZeroEv
 def pfFourEv : Ev 4 := pfEvPlus2 2 pfTwoEv
-
+-- to prove six is even, we need to prove 4 is even, and to prove 4 is even we need to prove 2 is even
+-- we can do this for any number via recursion, but we need a base case. Therefore, we assume 0 is even no matter what.
+def pSixEv   : Ev 6 := pfEvPlus2 4 pfFourEv
+-- supposed to be a proof that 4 is even here. can't really see the board though lol
 /-!
 Why can't we build a proof that 5 is even?
 Well, to do that, we'd need a proof that 3
@@ -194,8 +197,11 @@ def bothFromCville : Type :=
   MyAnd (IsFromCville Kevin) (IsFromCville Carter)
 
 -- we can construct a proof of it using MyAnd.intro
+
+-- QUIZ?
 def pfBothFromCville : bothFromCville :=
-  MyAnd.intro _ _
+  MyAnd.intro pfKevin pfCarter
+
 
 -- and we can of course also implement elim rules
 
