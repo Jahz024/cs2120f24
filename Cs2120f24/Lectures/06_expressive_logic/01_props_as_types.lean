@@ -182,7 +182,14 @@ def KandC_elim_right : KandC → C
 
 /-!
 The "elimination" axioms for *And* are represented by these
-functions. But we now have more than just paper-and-pencil logic;
+functions. But wif (curNode.data.compareTo(data) > 0) {
+    curNode.left = insert(data, curNode.left);
+} else if (curNode.data.compareTo(data) < 0) {
+    curNode.right = insert(data, curNode.right);
+} else {
+    return curNode;
+}
+e now have more than just paper-and-pencil logic;
 we have functions that compute! Let's see them in action: first
 P ∧ Q → P, then P ∧ Q → Q.
 -/

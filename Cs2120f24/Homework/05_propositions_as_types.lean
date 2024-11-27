@@ -32,8 +32,10 @@ Kloo type are the names of these three days: Marv, Wond, Fabl.
 Define this type in Lean.
 -/
 
--- You solution here
-
+inductive Kloo : Type
+| Marv : Kloo
+| Wond : Kloo
+| Fabl : Kloo
 
 /-!
 ### B. [10 points] A Unary Predicate Function
@@ -49,7 +51,9 @@ will all pass when you've got it right.
 
 open Kloo
 
--- answer
+def isFabl : Kloo → Bool
+| Kloo.Fabl => true
+| _ => false
 
 
 /-!
@@ -126,9 +130,14 @@ in revealing a bug. (The job of the developer is to get it
 right; the job of the tester is to show that it's wrong.)
 -/
 
--- function definition here
+def nextKloo : Kloo → Kloo
+| Kloo.Marv => Kloo.Wond
+| Kloo.Wond => Kloo.Fabl
+| Kloo.Fabl => Kloo.Marv
 
--- test cases here (write these first!)
+example : nextKloo Kloo.Marv = Kloo.Wond := rfl
+example : nextKloo Kloo.Wond = Kloo.Fabl := rfl
+example : nextKloo Kloo.Fabl = Kloo.Marv := rfl
 
 
 /-!
@@ -423,7 +432,13 @@ example. You can use whatever values of type Bool and Nat you
 want in this example.
 -/
 
+structure Product (α : Type) (β : Type) where
+  mk :: (first : α) (second : β)
 
+def swap : Product Bool Nat → Product Nat Bool
+| Product.mk b n => Product.mk n b
+
+example : swap (Product.mk true 42) = Product.mk 42 true := rfl
 /-!
 ### B. [20 points] Prove a Theorem
 
@@ -453,8 +468,9 @@ proof skeleton we give you here.
 -/
 
 theorem or_commutes: (P : Prop) → (Q : Prop) → (P ∨ Q) → (Q ∨ P)
-| _, _, _ => _
-| _, _, _ => _
+| P, Q, Or.inl p => Or.inr p  -- proof of P, use to prove Q ∨ P
+| P, Q, Or.inr q => Or.inl q  -- proof of Q, use to prove Q ∨ P
+
 
 /-!
 ### C. [20 points]
@@ -471,8 +487,11 @@ proposition, CIFC ∨ KIFC. What you've show
 -/
 
 -- answer: two proofs of KIFC ∨ CIFC
-def pfL : _ := _
-def pfR : _ := _
+-- left injection
+def pfL : KIFC ∨ CIFC := Or.inl pfKIFC1
+
+-- right injection
+def pfR : KIFC ∨ CIFC := Or.inr pfCIFC
 
 -- These check commands should be error-free when you've got it
 #check (or_commutes KIFC CIFC pfL : CIFC ∨ KIFC)

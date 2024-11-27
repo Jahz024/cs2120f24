@@ -82,75 +82,172 @@ def orIdempotent    : P ↔ (P ∨ P) :=
   )
 )
 
+-- proving and commutative: p ∧ q ↔ q ∧ p
+-- forward: if p and q, reorder as q and p
+-- backward: same logic, reorder q and p as p and q
 def andCommutative  : (P ∧ Q) ↔ (Q ∧ P) :=
-_
+Iff.intro
+  (fun (h : P ∧ Q) => And.intro h.right h.left)
+  (fun (h : Q ∧ P) => And.intro h.right h.left)
 
+-- proving or commutative: p ∨ q ↔ q ∨ p
+-- forward: if p or q, reorder as q or p
+-- backward: reorder q or p as p or q
 def orCommutative   : (P ∨ Q) ↔ (Q ∨ P) :=
-_
+Iff.intro
+  (fun (h : P ∨ Q) => Or.elim h (fun p => Or.inr p) (fun q => Or.inl q))
+  (fun (h : Q ∨ P) => Or.elim h (fun q => Or.inr q) (fun p => Or.inl p))
 
+
+-- proving identity and: p ∧ true ↔ p
+-- forward: p and true implies p
+-- backward: p implies p and true by adding true
 def identityAnd     : (P ∧ True) ↔ P :=
-_
+Iff.intro
+  (fun (h : P ∧ True) => h.left)
+  (fun (p : P) => And.intro p True.intro)
 
+-- proving identity or: p ∨ false ↔ p
+-- forward: p or false implies p by ignoring false
+-- backward: p implies p or false by picking left side
 def identityOr      : (P ∨ False) ↔ P :=
 Iff.intro
-  -- forwards
-  (fun (h : P ∨ False) =>
-    (Or.elim h
-      (fun (p : P) => p)
-      (fun (f : False) => False.elim f)
-    )
-  )
-  -- backwards
-  (fun (p : P) =>
-    (Or.inl p)
-  )
+  (fun (h : P ∨ False) => Or.elim h (fun p => p) (fun f => False.elim f))
+  (fun (p : P) => Or.inl p)
 
-def annhilateAnd    : (P ∧ False) ↔ False  :=
-_
 
+
+-- proving annihilate and: p ∧ false ↔ false
+-- forward: p and false is always false
+-- backward: false implies p and false since it implies anything
+def annhilateAnd    : (P ∧ False) ↔ False :=
+Iff.intro
+  (fun (h : P ∧ False) => h.right)
+  (fun (h : False) => False.elim h)
+
+-- proving annihilate or: p ∨ true ↔ true
+-- forward: p or true is always true
+-- backward: true implies p or true
 def annhilateOr     : (P ∨ True) ↔ True :=
-_
+Iff.intro
+  (fun (h : P ∨ True) => True.intro)
+  (fun (h : True) => Or.inr h)
 
+
+-- proving or associative: (p ∨ q) ∨ r ↔ p ∨ (q ∨ r)
+-- forward: reorder (p ∨ q) ∨ r to p ∨ (q ∨ r)
+-- backward: reorder p ∨ (q ∨ r) to (p ∨ q) ∨ r
 def orAssociative   : ((P ∨ Q) ∨ R) ↔ (P ∨ (Q ∨ R)) :=
-_
+Iff.intro
+  (fun (h : (P ∨ Q) ∨ R) =>
+    Or.elim h
+      (fun pq => Or.elim pq (fun p => Or.inl p) (fun q => Or.inr (Or.inl q)))
+      (fun r => Or.inr (Or.inr r))
+  )
+  (fun (h : P ∨ (Q ∨ R)) =>
+    Or.elim h
+      (fun p => Or.inl (Or.inl p))
+      (fun qr => Or.elim qr (fun q => Or.inl (Or.inr q)) (fun r => Or.inr r))
+  )
 
+
+-- proving and associative: (p ∧ q) ∧ r ↔ p ∧ (q ∧ r)
+-- forward: (p ∧ q) ∧ r reordered to p ∧ (q ∧ r)
+-- backward: p ∧ (q ∧ r) reordered to (p ∧ q) ∧ r
 def andAssociative  : ((P ∧ Q) ∧ R) ↔ (P ∧ (Q ∧ R)) :=
-_
+Iff.intro
+  (fun (h : (P ∧ Q) ∧ R) => And.intro h.left.left (And.intro h.left.right h.right))
+  (fun (h : P ∧ (Q ∧ R)) => And.intro (And.intro h.left h.right.left) h.right.right)
+
+-- proving distributive and over or: p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r)
+-- forward: if p and (q ∨ r), pair p with each
+-- backward: if p ∧ q or p ∧ r, use whichever applies
 
 def distribAndOr    : (P ∧ (Q ∨ R)) ↔ ((P ∧ Q) ∨ (P ∧ R)) :=
-_
-
-def distribOrAnd    : (P ∨ (Q ∧ R)) ↔ ((P ∨ Q) ∧ (P ∨ R)) :=
-_
-
-def equivalence     : (P ↔ Q) ↔ ((P → Q) ∧ (Q → P)) :=
-_
-
-def implication     : (P → Q) ↔ (¬P ∨ Q) :=
 Iff.intro
-  (fun (h : P → Q) =>
-    (Or.inr _))
-  (fun (h : (¬P ∨ Q)) =>
-    (fun (p : P) =>
-      Or.elim
-      h
-      (fun (k : ¬P) => False.elim (k p))
-      (fun q => q)
-    )
+  (fun (h : P ∧ (Q ∨ R)) =>
+    Or.elim h.right (fun q => Or.inl (And.intro h.left q)) (fun r => Or.inr (And.intro h.left r))
+  )
+  (fun (h : (P ∧ Q) ∨ (P ∧ R)) =>
+    Or.elim h (fun pq => And.intro pq.left (Or.inl pq.right)) (fun pr => And.intro pr.left (Or.inr pr.right))
   )
 
 
+-- proving distributive or over and: p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r)
+-- forward: if p or (q ∧ r), distribute p to each side
+-- backward: if p ∨ q and p ∨ r, combine cases
+def distribOrAnd    : (P ∨ (Q ∧ R)) ↔ ((P ∨ Q) ∧ (P ∨ R)) :=
+Iff.intro
+  (fun (h : P ∨ (Q ∧ R)) =>
+    Or.elim h (fun p => And.intro (Or.inl p) (Or.inl p)) (fun qr => And.intro (Or.inr qr.left) (Or.inr qr.right))
+  )
+  (fun (h : (P ∨ Q) ∧ (P ∨ R)) =>
+    Or.elim h.left (fun p => Or.inl p) (fun q => Or.elim h.right (fun p => Or.inl p) (fun r => Or.inr (And.intro q r)))
+  )
+
+
+
+-- proving equivalence as an and of implications: p ↔ q ↔ (p → q) ∧ (q → p)
+-- forward: p ↔ q gives both implications directly
+-- backward: if p → q and q → p, combine to get p ↔ q
+def equivalence     : (P ↔ Q) ↔ ((P → Q) ∧ (Q → P)) :=
+Iff.intro
+  (fun (h : P ↔ Q) => And.intro h.mp h.mpr)
+  (fun (h : (P → Q) ∧ (Q → P)) => Iff.intro h.left h.right)
+
+
+def implication : (P → Q) ↔ (¬P ∨ Q) :=
+Iff.intro
+  -- forward direction: (P → Q) → (¬P ∨ Q)
+  (fun h =>
+    Classical.em P |> λ
+      | Or.inl p => Or.inr (h p)
+      | Or.inr np => Or.inl np)
+  -- backward direction: (¬P ∨ Q) → (P → Q)
+  (fun h p =>
+    match h with
+    | Or.inl np => False.elim (np p)
+    | Or.inr q => q)
+
+
+-- proving exportation: (p ∧ q) → r ↔ p → q → r
+-- forward: if p ∧ q implies r, each part implies r
+-- backward: if p → q → r, combine p and q to get r
 def exportation     : ((P ∧ Q) → R) ↔ (P → Q → R) :=
-_
+Iff.intro
+  (fun (h : (P ∧ Q) → R) => fun p q => h (And.intro p q))
+  (fun (h : P → Q → R) => fun pq => h pq.left pq.right)
 
+
+-- proving absurdity: (p → q) ∧ (p → ¬q) implies ¬p
+-- forward: if p implies q and also ¬q, p cannot hold
 def absurdity       : (P → Q) ∧ (P → ¬Q) → ¬P :=
-_
+fun h p => (h.right p) (h.left p)
 
-def distribNotAnd   : ¬(P ∧ Q) ↔ (¬P ∨ ¬Q) :=
-_
+-- proving not distributive over and: ¬(p ∧ q) ↔ ¬p ∨ ¬q
+-- forward: if ¬(p ∧ q), one of p or q must fail
+-- backward: if ¬p or ¬q holds, then p ∧ q cannot hold
+-- couldnt figure out how to do this without classical.em used in latter parts of the experiment, had some help from other TA.
+def distribNotAnd : ¬(P ∧ Q) ↔ (¬P ∨ ¬Q) :=
+Iff.intro
+  (fun h =>
+    match Classical.em P with
+    | Or.inl p => Or.inr (fun q => h (And.intro p q))
+    | Or.inr np => Or.inl np
+    )
+  (fun h (pq : P ∧ Q) =>
+    match h with
+    | Or.inl np => np pq.left
+    | Or.inr nq => nq pq.right
+    )
 
+-- proving not distributive over or: ¬(p ∨ q) ↔ ¬p ∧ ¬q
+-- forward: if ¬(p ∨ q), both ¬p and ¬q must hold
+-- backward: if both ¬p and ¬q hold, p ∨ q cannot hold
 def distribNotOr    : ¬(P ∨ Q) ↔ (¬P ∧ ¬Q) :=
-_
+Iff.intro
+  (fun (h : ¬(P ∨ Q)) => And.intro (fun p => h (Or.inl p)) (fun q => h (Or.inr q)))
+  (fun (h : ¬P ∧ ¬Q) => fun (pq : P ∨ Q) => Or.elim pq (fun p => h.left p) (fun q => h.right q))
 
 
 /-!
@@ -249,3 +346,18 @@ example : P → Q :=
   match (Classical.em P) with
   | Or.inl p =>  _      -- P is true, with p a proof
   | Or.inr np => _      -- P is false, with np a proof
+
+-- we're going to do with Implication
+def implicationExtraCredit : (P → Q) ↔ (¬P ∨ Q) :=
+Iff.intro
+
+  (fun h =>
+    match Classical.em P with
+    | Or.inl p => Or.inr (h p)  -- if P  true, use h to get Q
+    | Or.inr np => Or.inl np     -- if ¬P holds, we're done
+    )
+  (fun h p =>
+    match h with
+    | Or.inl np => False.elim (np p)  -- if ¬P, contradiction
+    | Or.inr q => q                   -- if Q, return Q
+    )
