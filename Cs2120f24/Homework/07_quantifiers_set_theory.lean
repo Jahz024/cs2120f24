@@ -17,7 +17,7 @@ the work: everyone needs to work through every problem together.
 
 Collaborators? List names and email id's here:
 
-
+NO COLLABORATORS, DONE PURELY BY MYSELF (JAHIN)
 -/
 
 /-! #1 [20 points] Reasoning about set membership (no proofs involved)
@@ -41,7 +41,7 @@ def q0 : Set Nat := { 3, 4 }
 
 
 -- 1. s ∩ r
-def q1 : Set Nat := _
+def q1 : Set Nat := { 1, 2, 3, 4 }
 
 
 /-!
@@ -53,16 +53,16 @@ of the specified sets.
 
 
 -- 2. q2 = s \ t
-
+def q2 : Set Nat := { 0, 1, 2 }
 
 -- 3. q3 = t \ s
-
+def q3 : Set Nat := { 5 }
 
 -- 4. q4 = t × { 0, 1 }
-
+def q4 : Set (Nat × Nat) := { (3,0), (3,1), (4,0), (4,1), (5,0), (5,1) }
 
 -- 5. q5 = 𝒫 t
-
+def q5 : Set (Set Nat) := { ∅, {3}, {4}, {5}, {3,4}, {3,5}, {4,5}, {3,4,5} }
 
 /-!
 #2 [20 points]
@@ -91,21 +91,29 @@ example : 5 ∉ q0 :=
 -- A [5 points]
 
 -- Prove: 4 ∈ q0
-
+example : 4 ∈ q0 :=
+Or.inr rfl
 
 
 -- B [5 points]
 
 -- Prove: 3 ∈ s ∩ t
 
-
+example : 3 ∈ s ∩ t :=
+And.intro
+  (Or.inr (Or.inr (Or.inr (Or.inl rfl)))) -- proof that 3 ∈ s
+  (Or.inl rfl)                            -- proof that 3 ∈ t
 
 -- C [5 points]
 
 -- Prove 0 ∉ r
 
 example : 0 ∉ r :=
-_
+fun h : 0 ∈ r =>
+  match h with
+  | ⟨m, h'⟩ =>
+    have : 0 = m + 1 := h'
+    nomatch this    -- no natural number m makes m + 1 = 0
 
 /-!
 In addition to a formal proof, give a proof in English, explaining the
@@ -147,13 +155,14 @@ to start.
 -/
 
 example : ∅ ∈ 𝒫 t :=
-(
-  _
-)
+fun x => fun h : x ∈ ∅ => False.elim h
 
 /-!
 Now give a corresponding English-language proof. Here:
 
+To prove ∅ ∈ 𝒫 t, we need to show that the empty set is a subset of t. via definition of subset, we should prove that for all x, if x ∈ ∅ then x ∈ t.
+ this is tautologically tru b/c  there are no elements x in the empty set.
+  so, the implication is true for all x, making ∅ a subset of t and thus an element of t's powerset.
 Prove: ∅ ∈ 𝒫 t
 Proof: To show that ∅ ∈ 𝒫 t (which is the set of all
 subsets of t) we need to show that ∅ (the empty set)
@@ -221,10 +230,14 @@ example : (t \ { 5 }) ⊆ s :=
           (match mem45 with
           -- case where n = 4
           | Or.inl four =>
-            (_)   -- use the same method as used to show 3 ∈ s
+            by
+              rw [four]
+              exact (Or.inr (Or.inr (Or.inr (Or.inr rfl))))
+
           -- case where n = 5
           | Or.inr five =>
-            (_)   -- the final step uses a different axiom to finish it up
+            let r := And.right h
+            nomatch r  -- the final step uses a different axiom to finish it up
           )
         )
     )
@@ -249,4 +262,28 @@ next, by → intro, assume that n ∈ (t \ { 5 }). In the context
 of these assumptions our remaining goal is to prove n ∈ s.
 The proof of this proposition is by ... [hint: look at the
 formal proof!]
+
+
+
+Proof:
+
+to prove (t \ {5}) ⊆ s, we need to show that for any natural number n, if n ∈ (t \ {5}) then n ∈ s.
+we assume that n is an arbitrary natural number (∀ introduction).
+also assume n ∈ (t \ {5}) (→ introduction). this assumption tells us these two things :
+
+- n ∈ t (meaning n = 3 or n = 4 or n = 5)
+- n ∉ {5} (meaning n ≠ 5)
+
+now we need to prove n ∈ s. we can do this with case analysis on the fact that n ∈ t:
+case 1: If n = 3 then n ∈ s follows directly as 3 ∈ s
+
+case 2: If n = 4 then n ∈ s follows directly as 4 ∈ s
+
+case 3: If n = 5
+
+this case leads to a contradiction with our second assumption that n ∉ {5}
+so this case is impossible
+
+bc all possible cases where n ∈ t lead to either n ∈ s or a contradiction (when n = 5), we have proved that (t \ {5}) ⊆ s.
+
 -/
